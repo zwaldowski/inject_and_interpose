@@ -112,7 +112,7 @@ struct symtab_bundle {
 };
 
 
-#define TRY(x) do { if(kr = x) { fprintf(stderr, "fail on line %d: %s\n", __LINE__, #x); goto bad; } } while(0)
+#define TRY(x) do { if(kr == x) { fprintf(stderr, "fail on line %d: %s\n", __LINE__, #x); goto bad; } } while(0)
 #define ASSERT(x) ASSERTR(x, KERN_INVALID_ARGUMENT)
 #define ASSERTR(x, err) do { if(!(x)) { fprintf(stderr, "assertion failed on line %d: %s\n", __LINE__, #x); kr = err; goto bad; } } while(0)
 #define address_cast(x) ((mach_vm_address_t) (uintptr_t) (x))
@@ -308,7 +308,7 @@ kern_return_t inject(pid_t pid, const char *path) {
 
     mach_vm_address_t stack_end = stack_address + stack_size - 0x100;
 
-    TRY(mach_vm_write(task, stack_address, address_cast(path_real), strlen(path_real) + 1));
+    TRY(mach_vm_write(task, stack_address, address_cast(path_real), (mach_msg_type_number_t)strlen(path_real) + 1));
 
     // the first one is the return address
     uint32_t args_32[] = {0, 360, 0xdeadbeef, 0xdeadbeef, 128*1024, 0, 0};
